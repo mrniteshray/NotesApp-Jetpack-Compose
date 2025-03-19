@@ -17,11 +17,25 @@ class NoteViewModel(noteDao : NotesDao): ViewModel() {
     init {
         fetchNote()
     }
-
     fun insert(note : Note){
         viewModelScope.launch(Dispatchers.IO) {
             noteDao.insert(note)
             fetchNote()
+        }
+    }
+
+    fun update(note : Note){
+        viewModelScope.launch(Dispatchers.IO){
+            noteDao.update(note)
+            fetchNote()
+        }
+    }
+
+    fun delete(note : Note){
+        viewModelScope.launch(Dispatchers.IO) {
+            noteDao.delete(note)
+            val updatedList = noteDao.fetchNotes()
+            _NotesList.postValue(updatedList)
         }
     }
 
