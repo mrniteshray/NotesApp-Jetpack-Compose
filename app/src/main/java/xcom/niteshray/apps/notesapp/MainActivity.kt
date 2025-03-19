@@ -4,22 +4,42 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import xcom.niteshray.apps.notesapp.db.RoomDb
+import xcom.niteshray.apps.notesapp.ui.Screens.AddNoteScreen
+import xcom.niteshray.apps.notesapp.ui.Screens.HomeScreen
+import xcom.niteshray.apps.notesapp.ui.Screens.SplashScreen
 import xcom.niteshray.apps.notesapp.ui.theme.NotesAppTheme
+import xcom.niteshray.apps.notesapp.viewModel.NoteViewModel
+import xcom.niteshray.apps.notesapp.viewModel.NoteViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            NotesAppTheme {
 
+        setContent {
+            val navController = rememberNavController()
+            val database = RoomDb.getDatabase(this)
+            val factory = NoteViewModelFactory(database.NoteDao())
+            val noteViewModel : NoteViewModel = viewModel(factory = factory)
+
+
+            NotesAppTheme {
+                NavHost(navController , startDestination = "splash"){
+                    composable("splash") {
+                        SplashScreen(navController)
+                    }
+                    composable("home") {
+                        HomeScreen(noteViewModel,navController)
+                    }
+                    composable("addNote") {
+                        AddNoteScreen(noteViewModel,navController)
+                    }
+                }
             }
         }
     }
